@@ -12,6 +12,8 @@ const searchInput = document.getElementById('search-input');
 const filterTags = document.querySelectorAll('.filter-tag');
 const resultsCount = document.getElementById('results-count');
 const lastUpdatedTime = document.getElementById('last-updated-time');
+const themeToggle = document.getElementById('theme-toggle');
+const exportCsvBtn = document.getElementById('export-csv-btn');
 
 // Tweet Composer Elements
 const tweetTextarea = document.getElementById('tweet-textarea');
@@ -20,6 +22,12 @@ const charProgressCircle = document.getElementById('char-progress');
 const tweetBtn = document.getElementById('tweet-btn');
 const clearComposerBtn = document.getElementById('clear-composer');
 const selectedMeta = document.getElementById('selected-meta');
+
+// Theme Initial Application (Pre-DOM load for speed)
+const savedTheme = localStorage.getItem('theme') || 'dark';
+if (savedTheme === 'light') {
+    document.body.classList.add('light-theme');
+}
 
 // Circle Circumference Constants
 const CIRCLE_RADIUS = 10;
@@ -120,10 +128,9 @@ function setLoadingState(isLoading) {
     }
 }
 
-// Render Feed based on Filters and Search
-function renderFeed() {
-    // Filter
-    let filtered = allReleases.filter(item => {
+// Get currently filtered releases
+function getFilteredReleases() {
+    return allReleases.filter(item => {
         const matchesType = currentFilterType === 'all' || item.type.toLowerCase() === currentFilterType.toLowerCase();
         
         // Search inside HTML, type, date, or plaintext
@@ -135,6 +142,11 @@ function renderFeed() {
             
         return matchesType && matchesSearch;
     });
+}
+
+// Render Feed based on Filters and Search
+function renderFeed() {
+    let filtered = getFilteredReleases();
 
     resultsCount.textContent = `Showing ${filtered.length} update${filtered.length === 1 ? '' : 's'}`;
 
@@ -170,6 +182,9 @@ function renderFeed() {
                         <span class="badge ${finalBadgeClass}">${item.type}</span>
                     </div>
                     <div class="card-actions">
+                        <button class="btn-icon btn-copy-shortcut" data-id="${item.id}" title="Copy Update Text">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
                         <button class="btn-icon btn-tweet-shortcut" data-id="${item.id}" title="Quick Draft Tweet">
                             <i class="fa-brands fa-x-twitter"></i>
                         </button>
@@ -190,6 +205,22 @@ function renderFeed() {
     // Attach Click Event Handlers to cards
     document.querySelectorAll('.update-card').forEach(card => {
         card.addEventListener('click', (e) => {
+            // Handle Copy Shortcut
+            if (e.target.closest('.btn-copy-shortcut')) {
+                e.stopPropagation();
+                const id = e.target.closest('.btn-copy-shortcut').dataset.id;
+                const update = allReleases.find(item => item.id === id);
+                if (update) {
+                    navigator.clipboard.writeText(update.text).then(() => {
+                        showToast("Copied description to clipboard!");
+                    }).catch(err => {
+                        console.error("Failed to copy text:", err);
+                        showToast("Failed to copy description!");
+                    });
+                }
+                return;
+            }
+
             // If user clicked the shortcut tweet button on the card, we handle it separately
             if (e.target.closest('.btn-tweet-shortcut')) {
                 e.stopPropagation();
@@ -314,6 +345,40 @@ function openTwitterIntent() {
     window.open(shareUrl, '_blank', 'width=550,height=420');
 }
 
+// Export to CSV Function
+function exportToCSV() {
+    const filtered = getFilteredReleases();
+    if (filtered.length === 0) {
+        showToast("No updates to export!");
+        return;
+    }
+    
+    // CSV headers
+    let csvContent = "Date,Category,Description,Link\n";
+    
+    filtered.forEach(item => {
+        // Escape fields for CSV format
+        const escapedDate = `"${item.date.replace(/"/g, '""')}"`;
+        const escapedType = `"${item.type.replace(/"/g, '""')}"`;
+        const escapedText = `"${item.text.replace(/"/g, '""')}"`;
+        const escapedLink = `"${item.link.replace(/"/g, '""')}"`;
+        
+        csvContent += `${escapedDate},${escapedType},${escapedText},${escapedLink}\n`;
+    });
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `bigquery_release_notes_${currentFilterType}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showToast("Exported CSV successfully!");
+}
+
 // Event Listeners
 refreshBtn.addEventListener('click', () => fetchReleases(true));
 
@@ -337,7 +402,27 @@ tweetBtn.addEventListener('click', openTwitterIntent);
 
 clearComposerBtn.addEventListener('click', clearSelection);
 
+if (exportCsvBtn) {
+    exportCsvBtn.addEventListener('click', exportToCSV);
+}
+
+// Theme Switch Event Listener
+if (themeToggle) {
+    themeToggle.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            document.body.classList.add('light-theme');
+            localStorage.setItem('theme', 'light');
+        } else {
+            document.body.classList.remove('light-theme');
+            localStorage.setItem('theme', 'dark');
+        }
+    });
+}
+
 // Initial Load
 document.addEventListener('DOMContentLoaded', () => {
+    if (themeToggle) {
+        themeToggle.checked = document.body.classList.contains('light-theme');
+    }
     fetchReleases();
 });

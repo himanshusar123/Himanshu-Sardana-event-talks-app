@@ -41,6 +41,37 @@
     --transition-normal: 0.25s ease;
 }
 
+/* Light Theme Variables Override */
+body.light-theme {
+    --bg-main: #f3f4f6;
+    --bg-sidebar: rgba(255, 255, 255, 0.8);
+    --bg-card: rgba(255, 255, 255, 0.7);
+    --bg-card-hover: rgba(255, 255, 255, 0.95);
+    --bg-card-selected: rgba(139, 92, 246, 0.08);
+    
+    --border-color: rgba(209, 213, 219, 0.6);
+    --border-hover: rgba(139, 92, 246, 0.5);
+    --border-selected: #8b5cf6;
+    
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #9ca3af;
+    
+    --badge-feature: rgba(16, 185, 129, 0.1);
+    --badge-feature-text: #059669;
+    --badge-announcement: rgba(59, 130, 246, 0.1);
+    --badge-announcement-text: #2563eb;
+    --badge-issue: rgba(245, 158, 11, 0.1);
+    --badge-issue-text: #d97706;
+    --badge-deprecation: rgba(239, 68, 68, 0.1);
+    --badge-deprecation-text: #dc2626;
+}
+
+/* Base Transition Settings for Dark/Light Switch */
+body, .app-header, .sidebar-section, .update-card, .btn, .btn-icon, textarea, input, .selected-meta {
+    transition: background-color var(--transition-normal), border-color var(--transition-normal), color var(--transition-normal), box-shadow var(--transition-normal);
+}
+
 /* Base resets & styles */
 * {
     margin: 0;
@@ -677,3 +708,148 @@ body {
         position: static;
     }
 }
+
+/* Secondary Button (Export to CSV) */
+.btn-secondary {
+    background: rgba(31, 41, 55, 0.4);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.btn-secondary:hover {
+    background: rgba(31, 41, 55, 0.8);
+    border-color: var(--border-hover);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+}
+
+body.light-theme .btn-secondary {
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--text-secondary);
+}
+
+body.light-theme .btn-secondary:hover {
+    background: white;
+    color: var(--text-primary);
+    border-color: var(--accent-primary);
+}
+
+/* Theme Toggle Switch */
+.theme-toggle-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-right: 1.25rem;
+}
+
+.theme-icon {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    transition: color var(--transition-fast);
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 20px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--border-color);
+    transition: .4s;
+    border: 1px solid var(--border-color);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: var(--accent-primary);
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px var(--accent-primary);
+}
+
+input:checked + .slider:before {
+    transform: translateX(18px);
+}
+
+.slider.round {
+    border-radius: 20px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* Light Theme Background Adjustment */
+body.light-theme {
+    background-image: 
+        radial-gradient(at 0% 0%, hsla(220, 20%, 94%, 1) 0, transparent 50%),
+        radial-gradient(at 50% 0%, hsla(220, 20%, 90%, 1) 0, transparent 50%),
+        radial-gradient(at 100% 0%, hsla(263, 20%, 92%, 0.3) 0, transparent 50%);
+}
+
+body.light-theme .logo-text h1 {
+    background: linear-gradient(to right, var(--text-primary), var(--text-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+body.light-theme .update-card:hover {
+    background: var(--bg-card-hover);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .btn-icon:hover {
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+}
+
+body.light-theme .btn-tweet {
+    background-color: #1f2937;
+    color: white;
+}
+
+body.light-theme .btn-tweet:hover:not(:disabled) {
+    background-color: #111827;
+    box-shadow: 0 0 12px rgba(31, 41, 55, 0.2);
+}
+
+body.light-theme .progress-ring-bg {
+    stroke: #e5e7eb;
+}
+
+body.light-theme .toast {
+    background-color: white;
+    color: var(--text-primary);
+    border-color: var(--accent-primary);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+

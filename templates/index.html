@@ -28,6 +28,14 @@
                 </div>
             </div>
             <div class="header-actions">
+                <div class="theme-toggle-container">
+                    <i class="fa-regular fa-moon theme-icon"></i>
+                    <label class="switch" title="Toggle Light/Dark Theme">
+                        <input type="checkbox" id="theme-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                    <i class="fa-regular fa-sun theme-icon"></i>
+                </div>
                 <button id="refresh-btn" class="btn btn-primary" title="Refresh Release Notes">
                     <i id="refresh-icon" class="fa-solid fa-arrows-rotate"></i>
                     <span>Refresh</span>
@@ -93,7 +101,10 @@
                         <span id="last-updated-time" class="timestamp"></span>
                     </div>
                     <div class="view-options">
-                        <!-- Group by date or display list -->
+                        <button id="export-csv-btn" class="btn btn-secondary" title="Export current updates to CSV">
+                            <i class="fa-solid fa-file-csv"></i>
+                            <span>Export CSV</span>
+                        </button>
                     </div>
                 </div>
 
